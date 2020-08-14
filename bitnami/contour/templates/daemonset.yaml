@@ -130,11 +130,15 @@ spec:
         {{- end }}
         ports:
         - containerPort: 80
+          {{- if .Values.envoy.useHostPort }}
           hostPort: 80
+          {{- end }}
           name: http
           protocol: TCP
         - containerPort: 443
+          {{- if .Values.envoy.useHostPort }}
           hostPort: 443
+          {{- end }}
           name: https
           protocol: TCP
         - containerPort: 8002
