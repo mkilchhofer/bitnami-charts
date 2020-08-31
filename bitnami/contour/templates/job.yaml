@@ -1,4 +1,4 @@
-{{- if .Values.contour.enabled }}
+{{- if and .Values.contour.enabled .Values.certgen.enabled }}
 ---
 apiVersion: batch/v1
 kind: Job
@@ -13,20 +13,24 @@ spec:
       labels: {{- include "common.labels.standard" . | nindent 8 }}
         app.kubernetes.io/component: contour-certgen
     spec:
-      {{- include "common.images.pullSecrets" ( dict "images" (list .Values.contour.image) "global" .Values.global) | nindent 6 }}
-      {{- if .Values.contour.nodeSelector }}
-      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.contour.nodeSelector "context" $) | nindent 8 }}
+      {{- include "common.images.pullSecrets" ( dict "images" (list .Values.certgen.image) "global" .Values.global) | nindent 6 }}
+      {{- if .Values.certgen.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.certgen.nodeSelector "context" $) | nindent 8 }}
       {{- end }}
-      {{- if .Values.contour.affinity }}
-      affinity: {{- include "common.tplvalues.render" (dict "value" .Values.contour.affinity "context" $) | nindent 8 }}
+      {{- if .Values.certgen.affinity }}
+      affinity: {{- include "common.tplvalues.render" (dict "value" .Values.certgen.affinity "context" $) | nindent 8 }}
       {{- end }}
-      {{- if .Values.contour.tolerations}}
-      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.contour.tolerations "context" $) | nindent 8 }}
+      {{- if .Values.certgen.tolerations}}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.certgen.tolerations "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.certgen.initContainers }}
+      initContainers:
+        {{- include "common.tplvalues.render" ( dict "value" .Values.certgen.initContainers "context" $ ) | nindent 6 }}
       {{- end }}
       containers:
       - name: contour
-        image: {{ include "common.images.image" ( dict "imageRoot" .Values.contour.image "global" .Values.global) }}
-        imagePullPolicy: {{ .Values.contour.image.pullPolicy }}
+        image: {{ include "common.images.image" ( dict "imageRoot" .Values.certgen.image "global" .Values.global) }}
+        imagePullPolicy: {{ .Values.certgen.image.pullPolicy }}
         command:
         - contour
         args:
@@ -41,30 +45,30 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        {{- if .Values.contour.extraEnvVars }}
-          {{- include "common.tplvalues.render" (dict "value" .Values.contour.extraEnvVars "context" $) | nindent 8 }}
+        {{- if .Values.certgen.extraEnvVars }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.certgen.extraEnvVars "context" $) | nindent 8 }}
         {{- end }}
-        {{- if or .Values.contour.extraEnvVarsConfigMap .Values.contour.extraEnvVarsSecret }}
+        {{- if or .Values.certgen.extraEnvVarsConfigMap .Values.certgen.extraEnvVarsSecret }}
         envFrom:
-          {{- if .Values.contour.extraEnvVarsConfigMap }}
+          {{- if .Values.certgen.extraEnvVarsConfigMap }}
           - configMapRef:
-              name: {{ include "common.tplvalues.render" ( dict "value" .Values.contour.extraEnvVarsConfigMap "context" $ ) }}
+              name: {{ include "common.tplvalues.render" ( dict "value" .Values.certgen.extraEnvVarsConfigMap "context" $ ) }}
           {{- end }}
-          {{- if .Values.contour.extraEnvVarsSecret }}
+          {{- if .Values.certgen.extraEnvVarsSecret }}
           - secretRef:
-              name: {{ include "common.tplvalues.render" ( dict "value" .Values.contour.extraEnvVarsSecret "context" $ ) }}
+              name: {{ include "common.tplvalues.render" ( dict "value" .Values.certgen.extraEnvVarsSecret "context" $ ) }}
           {{- end }}
         {{- end }}
         resources:
-{{ toYaml .Values.contour.resources | indent 10 }}
+{{ toYaml .Values.certgen.resources | indent 10 }}
       restartPolicy: Never
       serviceAccountName: {{ include "contour.contourCertGenServiceAccountName" . }}
-      {{- if .Values.contour.securityContext.enabled }}
+      {{- if .Values.certgen.securityContext.enabled }}
       securityContext:
-        runAsUser: {{ .Values.contour.securityContext.runAsUser }}
-        runAsGroup: {{ .Values.contour.securityContext.runAsGroup }}
-        fsGroup: {{ .Values.contour.securityContext.fsGroup }}
-        runAsNonRoot: {{ .Values.contour.securityContext.runAsNonRoot }}
+        runAsUser: {{ .Values.certgen.securityContext.runAsUser }}
+        runAsGroup: {{ .Values.certgen.securityContext.runAsGroup }}
+        fsGroup: {{ .Values.certgen.securityContext.fsGroup }}
+        runAsNonRoot: {{ .Values.certgen.securityContext.runAsNonRoot }}
       {{- end }}
   parallelism: 1
   completions: 1

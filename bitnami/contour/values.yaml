@@ -121,6 +121,100 @@ rbac:
   # create specifies whether to install and use RBAC rules.
   create: true
 
+certgen:
+  enabled: true
+  image:
+    registry: docker.io
+    repository: bitnami/contour
+    tag: latest
+    ## Specify a imagePullPolicy
+    ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+    ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+    ##
+    pullPolicy: Always
+
+  ## certgen container resource requests and limits
+  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ## ref: https://projectcontour.io/guides/resource-limits/
+  ##
+  resources:
+    ## We usually recommend not to specify default resources and to leave this as a conscious
+    ## choice for the user. This also increases chances charts run on environments with little
+    ## resources, such as Minikube. If you do want to specify resources, uncomment the following
+    ## lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    limits: {}
+      # cpu: 400m
+      # memory: 250Mi
+    requests: {}
+      # cpu: 100m
+      # memory: 25Mi
+
+  ## Node labels for pod assignment
+  ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+
+  ## Tolerations for pod assignment
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+
+  ## Affinity for pod assignment
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ##
+  affinity: {}
+
+  ## Pod annotations
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  podAnnotations: {}
+
+  serviceAccount:
+    # Specifies whether a ServiceAccount should be created
+    create: true
+    # The name of the ServiceAccount to use.  If not set and create is
+    # true, a name is generated using the fullname template
+    name: ""
+
+  securityContext:
+    enabled: true
+    runAsNonRoot: true
+    runAsUser: 1001
+    runAsGroup: 1001
+
+  ## Add init containers to the pod
+  ## For example:
+  ## initContainers:
+  ##   - name: your-image-name
+  ##     image: your-image
+  ##     imagePullPolicy: Always
+  ##
+  initContainers: []
+
+  ## Array to add extra volumes
+  ##
+  extraVolumes: []
+
+  ## Array to add extra mounts (normally used with extraVolumes)
+  ##
+  extraVolumeMounts: []
+
+  ## An array to add extra env vars
+  ## For example:
+  ## extraEnvVars:
+  ##  - name: MY_ENV_VAR
+  ##    value: env_var_value
+  ##
+  extraEnvVars: []
+
+  ## Name of a ConfigMap containing extra env vars
+  ##
+  extraEnvVarsConfigMap: ""
+
+  ## Name of a Secret containing extra env vars
+  ##
+  extraEnvVarsSecret: ""
+
 contour:
   enabled: true
   image:
@@ -212,14 +306,6 @@ contour:
     runAsNonRoot: true
     runAsUser: 1001
     runAsGroup: 1001
-
-  certgen:
-    serviceAccount:
-      # Specifies whether a ServiceAccount should be created
-      create: true
-      # The name of the ServiceAccount to use.  If not set and create is
-      # true, a name is generated using the fullname template
-      name: ""
 
   ## Contour Service properties
   ##

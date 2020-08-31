@@ -26,10 +26,10 @@ Create the name of the contour service account to use
 Create the name of the contour-certgen service account to use
 */}}
 {{- define "contour.contourCertGenServiceAccountName" -}}
-{{- if .Values.contour.certgen.serviceAccount.create -}}
-    {{ default (printf "%s-contour-certgen" (include "common.names.fullname" .)) .Values.contour.certgen.serviceAccount.name }}
+{{- if .Values.certgen.serviceAccount.create -}}
+    {{ default (printf "%s-contour-certgen" (include "common.names.fullname" .)) .Values.certgen.serviceAccount.name }}
 {{- else -}}
-    {{ default "default" .Values.contour.certgen.serviceAccount.name }}
+    {{ default "default" .Values.certgen.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
 
